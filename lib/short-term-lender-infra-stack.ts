@@ -32,17 +32,17 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
     initializeOidcProvider(this, props.ghOrgName, this.account, props.namingPrefix);
 
     // ===== Step No. 2 =====
-    // const vpc = createVpc(this, props.namingPrefix);
+    const vpc = createVpc(this, props.namingPrefix);
 
     // // ===== Step No. 3 =====
-    // const s3Bucket = createS3Bucket(this, props.namingPrefix);
-    // const ec2Instance = createEC2Instance(this, vpc, props.ec2KeyPairName, props.namingPrefix);
+    const s3Bucket = createS3Bucket(this, props.namingPrefix);
+    const ec2Instance = createEC2Instance(this, vpc, props.ec2KeyPairName, props.namingPrefix);
 
     // // ===== Step No. 4 =====
     // initializeCloudFrontDistribution(this, s3Bucket, props.frontEndDomain, props.frontEndCertArn, props.namingPrefix);
     // initializeApiCloudFrontDistribution(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix);
 
-    // initializeCognito(this, props.namingPrefix, props.frontEndDomain);
+    initializeCognito(this, props.namingPrefix, props.frontEndDomain);
 
     // // ===== Step No. 5 =====
     // const db = createDBInstance(this, vpc, props.dbUsername, props.dbPort, props.namingPrefix);
@@ -233,9 +233,9 @@ const initializeCloudFrontDistribution = (scope: Construct, bucket: s3.Bucket, d
   const cachePolicy = new CachePolicy(scope, `${namingPrefix}-cache-policy`, {
     cachePolicyName: `${namingPrefix}-cache-policy`,
     comment: 'Custom cache policy for the CloudFront distribution',
-    defaultTtl: cdk.Duration.minutes(10),
-    minTtl: cdk.Duration.minutes(5),
-    maxTtl: cdk.Duration.minutes(10),
+    defaultTtl: cdk.Duration.minutes(5),
+    minTtl: cdk.Duration.minutes(1),
+    maxTtl: cdk.Duration.minutes(5),
     cookieBehavior: CacheCookieBehavior.none(),
     headerBehavior: CacheHeaderBehavior.none(),
     queryStringBehavior: CacheQueryStringBehavior.none()
