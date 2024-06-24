@@ -142,7 +142,7 @@ const createDBInstance = (scope: Construct, vpc: ec2.Vpc, dbUsername: string, po
   dbSG.addIngressRule(
     ec2.Peer.anyIpv4(),
     ec2.Port.tcp(port),
-    'Allow MSSQL Connections.'
+    'Allow PostgreSQL Connections.'
   );
 
   const dbInstance = new rds.DatabaseInstance(scope, `${namingPrefix}-rds`, {
@@ -150,8 +150,8 @@ const createDBInstance = (scope: Construct, vpc: ec2.Vpc, dbUsername: string, po
     vpcSubnets: {
       subnetType: ec2.SubnetType.PUBLIC,
     },
-    engine: rds.DatabaseInstanceEngine.sqlServerEx({
-      version: rds.SqlServerEngineVersion.VER_16,
+    engine: rds.DatabaseInstanceEngine.postgres({
+      version: rds.PostgresEngineVersion.VER_16_3,
     }),
     instanceType: ec2.InstanceType.of(
       ec2.InstanceClass.BURSTABLE3,
