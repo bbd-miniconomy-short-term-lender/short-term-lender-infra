@@ -358,8 +358,8 @@ const initializeCognito = (scope: Construct, namingPrefix: string, frontEndDomai
     readAttributes: clientReadAttributes,
     writeAttributes: clientWriteAttributes,
     oAuth: {
-      callbackUrls: [frontEndDomain, 'http://localhost:5500', 'https://localhost:5500'],
-      logoutUrls: [frontEndDomain, 'http://localhost:5500', 'https://localhost:5500']
+      callbackUrls: [`https://${frontEndDomain}`, 'http://localhost:5500', 'https://localhost:5500'],
+      logoutUrls: [`https://${frontEndDomain}`, 'http://localhost:5500', 'https://localhost:5500']
     }
   });
 }
