@@ -45,8 +45,8 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
     initializeCognito(this, props.namingPrefix, props.frontEndDomain);
 
     // // ===== Step No. 5 =====
-    const db = createDBInstance(this, vpc, props.dbUsername, props.dbPort, props.namingPrefix);
-    db.connections.allowFrom(ec2Instance, ec2.Port.tcp(props.dbPort));
+    // const db = createDBInstance(this, vpc, props.dbUsername, props.dbPort, props.namingPrefix);
+    // db.connections.allowFrom(ec2Instance, ec2.Port.tcp(props.dbPort));
   }
 }
 
