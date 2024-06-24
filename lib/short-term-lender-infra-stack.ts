@@ -32,7 +32,7 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
     initializeOidcProvider(this, props.ghOrgName, this.account, props.namingPrefix);
 
     // ===== Step No. 2 =====
-    // const vpc = createVpc(this, props.namingPrefix);
+    const vpc = createVpc(this, props.namingPrefix);
 
     // // ===== Step No. 3 =====
     // const s3Bucket = createS3Bucket(this, props.namingPrefix);
