@@ -34,17 +34,17 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
     // ===== Step No. 2 =====
     const vpc = createVpc(this, props.namingPrefix);
 
-    // // ===== Step No. 3 =====
+    // ===== Step No. 3 =====
     const s3Bucket = createS3Bucket(this, props.namingPrefix);
     const ec2Instance = createEC2Instance(this, vpc, props.ec2KeyPairName, props.namingPrefix);
 
-    // // ===== Step No. 4 =====
-    // initializeCloudFrontDistribution(this, s3Bucket, props.frontEndDomain, props.frontEndCertArn, props.namingPrefix);
-    // initializeApiCloudFrontDistribution(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix);
+    // ===== Step No. 4 =====
+    initializeCloudFrontDistribution(this, s3Bucket, props.frontEndDomain, props.frontEndCertArn, props.namingPrefix);
+    initializeApiCloudFrontDistribution(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix);
 
     initializeCognito(this, props.namingPrefix, props.frontEndDomain);
 
-    // // ===== Step No. 5 =====
+    // ===== Step No. 5 =====
     const db = createDBInstance(this, vpc, props.dbUsername, props.dbPort, props.namingPrefix);
     db.connections.allowFrom(ec2Instance, ec2.Port.tcp(props.dbPort));
   }
