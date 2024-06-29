@@ -10,6 +10,7 @@ import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { HttpOrigin, S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import { readFileSync } from 'fs';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 
 export interface ExtendedStackProps extends cdk.StackProps {
   readonly namingPrefix: string;
@@ -21,6 +22,7 @@ export interface ExtendedStackProps extends cdk.StackProps {
   readonly frontEndCertArn: string,
   readonly apiDomain: string,
   readonly apiCertArn: string,
+  readonly configParamName: string,
 }
 
 export class ShortTermLenderInfraStack extends cdk.Stack {
@@ -47,6 +49,13 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
     // ===== Step No. 5 =====
     const db = createDBInstance(this, vpc, props.dbUsername, props.dbPort, props.namingPrefix);
     db.connections.allowFrom(ec2Instance, ec2.Port.tcp(props.dbPort));
+
+    // ======================
+    const configFileJs = readFileSync('./config.js', 'utf-8');
+    const configParam = new StringParameter(this, `${props.namingPrefix}-config-param`, {
+      stringValue: configFileJs,
+      parameterName: props.configParamName,
+    })
   }
 }
 
