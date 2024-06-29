@@ -14,5 +14,5 @@ new ShortTermLenderInfraStack(app, 'ShortTermLenderInfraStack', {
   frontEndCertArn: 'arn:aws:acm:us-east-1:680901290385:certificate/e1b4dc3b-a0a3-4a49-9752-8c5fe5aca29a',
   apiDomain: 'api.loans.projects.bbdgrad.com',
   apiCertArn: 'arn:aws:acm:us-east-1:680901290385:certificate/aa9c5883-2a62-435b-9bb0-80dcb2d7c1b7',
-  configParamName: '/stl/config/',
+  configParamName: '/stl/config',
 });
