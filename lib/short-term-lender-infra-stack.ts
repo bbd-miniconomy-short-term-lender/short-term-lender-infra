@@ -51,7 +51,7 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
     db.connections.allowFrom(ec2Instance, ec2.Port.tcp(props.dbPort));
 
     // ======================
-    const configFileJs = readFileSync('./config.js', 'utf-8');
+    const configFileJs = readFileSync('./lib/config.js', 'utf-8');
     const configParam = new StringParameter(this, `${props.namingPrefix}-config-param`, {
       stringValue: configFileJs,
       parameterName: props.configParamName,
