@@ -294,8 +294,10 @@ const initializeApiCloudFrontDistribution = (scope: Construct, ec2: ec2.Instance
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       originRequestPolicy: {
         originRequestPolicyId: originRequestPolicy.originRequestPolicyId,
-      }
+      },
     },
+    domainNames: [domainNames],
+    certificate: Certificate.fromCertificateArn(scope, `${namingPrefix}-api-cert`, certArn),
   });
 }
 
