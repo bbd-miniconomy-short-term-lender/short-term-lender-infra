@@ -93,7 +93,7 @@ const createEC2Instance = (scope: Construct, vpc: ec2.Vpc, keyPairName: string, 
 
   ec2SG.addIngressRule(
     ec2.Peer.anyIpv4(),
-    ec2.Port.tcp(80),
+    ec2.Port.tcp(5000),
     'Allow API Requests.'
   );
 
