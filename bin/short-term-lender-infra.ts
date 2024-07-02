@@ -13,6 +13,8 @@ new ShortTermLenderInfraStack(app, 'ShortTermLenderInfraStack', {
   frontEndDomain: 'loans.projects.bbdgrad.com',
   frontEndCertArn: 'arn:aws:acm:us-east-1:680901290385:certificate/e1b4dc3b-a0a3-4a49-9752-8c5fe5aca29a',
   apiDomain: 'api.loans.projects.bbdgrad.com',
-  apiCertArn: 'arn:aws:acm:us-east-1:680901290385:certificate/aa9c5883-2a62-435b-9bb0-80dcb2d7c1b7',
+  apiCertArn: 'arn:aws:acm:eu-west-1:680901290385:certificate/2d0201e9-9bc5-474a-9f3a-b16dcc880e27',
   configParamName: '/stl/config',
+  mTlsBucketName: 'miniconomy-trust-store-bucket',
+  mTlsPemPath: 'truststore.pem',
 });

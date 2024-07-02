@@ -11,6 +11,8 @@ import { HttpOrigin, S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import { readFileSync } from 'fs';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
+import * as integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 
 export interface ExtendedStackProps extends cdk.StackProps {
   readonly namingPrefix: string;
@@ -23,6 +25,8 @@ export interface ExtendedStackProps extends cdk.StackProps {
   readonly apiDomain: string,
   readonly apiCertArn: string,
   readonly configParamName: string,
+  readonly mTlsPemPath: string,
+  readonly mTlsBucketName: string,
 }
 
 export class ShortTermLenderInfraStack extends cdk.Stack {
@@ -42,7 +46,7 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
 
     // ===== Step No. 4 =====
     initializeCloudFrontDistribution(this, s3Bucket, props.frontEndDomain, props.frontEndCertArn, props.namingPrefix);
-    initializeApiCloudFrontDistribution(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix);
+    initializeApiGateWay(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix, props.mTlsPemPath, props.mTlsBucketName);
 
     initializeCognito(this, props.namingPrefix, props.frontEndDomain);
 
@@ -57,6 +61,34 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
       parameterName: props.configParamName,
     })
   }
+}
+
+const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: string, certArn: string, namingPrefix: string, mTlsPemPath: string, mTlsBucketName: string) => {
+  const api = new apigatewayv2.HttpApi(scope, `${namingPrefix}-api-gateway`);
+
+  const proxyIntegration = new integrations.HttpUrlIntegration(`${namingPrefix}-proxy-int`, `http://${ec2.instancePublicIp}:5000/{proxy}`);
+
+  api.addRoutes({
+    path: '/{proxy+}',
+    integration: proxyIntegration,
+    methods: [apigatewayv2.HttpMethod.ANY],
+  });
+
+  const domainName = new apigatewayv2.DomainName(scope, `${namingPrefix}-custom-domain`, {
+    domainName: domainNames,
+    certificate: Certificate.fromCertificateArn(scope, `${namingPrefix}-api-cert`, certArn),
+    endpointType: apigatewayv2.EndpointType.REGIONAL,
+    mtls: {
+        bucket: s3.Bucket.fromBucketName(scope, `${namingPrefix}-bucket-connection`, mTlsBucketName),
+        key: mTlsPemPath,
+    },
+  });
+
+  new apigatewayv2.ApiMapping(scope, `${namingPrefix}-api-mapping`, {
+    api: api,
+    domainName: domainName,
+    stage: api.defaultStage!,
+});
 }
 
 const createVpc = (construct: Construct, namingPrefix: string): ec2.Vpc => {
@@ -226,7 +258,7 @@ const initializeOidcProvider = (scope: Construct, githubOrganisation: string, ac
           }),
           new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
-            actions: ['ec2:DescribeInstances', 'ssm:GetParameter'],
+            actions: ['ec2:DescribeInstances', 'ssm:GetParameter', 'secretsmanager:GetSecretValue'],
             resources: [`*`],
           }),
         ],
