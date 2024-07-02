@@ -24,4 +24,4 @@ jobs:
         run: npm install
 
       - name: CDK Diff
-        run: npx cdk diff --require-approval never
+        run: npx cdk diff ShortTermLenderInfraStack --require-approval never
