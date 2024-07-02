@@ -64,7 +64,7 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
 }
 
 const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: string, certArn: string, namingPrefix: string, mTlsPemPath: string, mTlsBucketName: string) => {
-  const api = new apigatewayv2.HttpApi(scope, `${namingPrefix}-api-gateway`);
+  const api = new apigatewayv2.HttpApi(scope, `${namingPrefix}-api-gateway`, { disableExecuteApiEndpoint: true });
 
   const proxyIntegration = new integrations.HttpUrlIntegration(`${namingPrefix}-proxy-int`, `http://${ec2.instancePublicIp}:5000/{proxy}`);
 
@@ -79,8 +79,8 @@ const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: 
     certificate: Certificate.fromCertificateArn(scope, `${namingPrefix}-api-cert`, certArn),
     endpointType: apigatewayv2.EndpointType.REGIONAL,
     mtls: {
-        bucket: s3.Bucket.fromBucketName(scope, `${namingPrefix}-bucket-connection`, mTlsBucketName),
-        key: mTlsPemPath,
+      bucket: s3.Bucket.fromBucketName(scope, `${namingPrefix}-bucket-connection`, mTlsBucketName),
+      key: mTlsPemPath,
     },
   });
 
@@ -88,7 +88,7 @@ const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: 
     api: api,
     domainName: domainName,
     stage: api.defaultStage!,
-});
+  });
 }
 
 const createVpc = (construct: Construct, namingPrefix: string): ec2.Vpc => {
