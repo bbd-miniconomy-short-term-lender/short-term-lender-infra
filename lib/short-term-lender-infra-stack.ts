@@ -25,6 +25,8 @@ export interface ExtendedStackProps extends cdk.StackProps {
   readonly apiDomain: string,
   readonly apiCertArn: string,
   readonly configParamName: string,
+  readonly mTlsPemPath: string,
+  readonly mTlsBucketName: string,
 }
 
 export class ShortTermLenderInfraStack extends cdk.Stack {
@@ -44,7 +46,7 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
 
     // ===== Step No. 4 =====
     initializeCloudFrontDistribution(this, s3Bucket, props.frontEndDomain, props.frontEndCertArn, props.namingPrefix);
-    initializeApiGateWay(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix);
+    initializeApiGateWay(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix, props.mTlsPemPath, props.mTlsBucketName);
 
     initializeCognito(this, props.namingPrefix, props.frontEndDomain);
 
@@ -61,7 +63,7 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
   }
 }
 
-const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: string, certArn: string, namingPrefix: string) => {
+const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: string, certArn: string, namingPrefix: string, mTlsPemPath: string, mTlsBucketName: string) => {
   const api = new apigatewayv2.HttpApi(scope, `${namingPrefix}-api-gateway`);
 
   const proxyIntegration = new integrations.HttpUrlIntegration(`${namingPrefix}-proxy-int`, `http://${ec2.instancePublicIp}:5000/{proxy}`);
@@ -71,6 +73,23 @@ const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: 
     integration: proxyIntegration,
     methods: [apigatewayv2.HttpMethod.ANY],
   });
+
+  const domainName = new apigatewayv2.DomainName(scope, `${namingPrefix}-custom-domain`, {
+    domainName: domainNames,
+    certificate: Certificate.fromCertificateArn(scope, `${namingPrefix}-api-cert`, certArn),
+    endpointType: apigatewayv2.EndpointType.REGIONAL,
+    mtls: {
+        bucket: s3.Bucket.fromBucketName(scope, `${namingPrefix}-bucket-connection`, mTlsBucketName),
+        key: mTlsPemPath,
+    },
+  });
+
+  new apigatewayv2.ApiMapping(scope, `${namingPrefix}-api-mapping`, {
+    api: api,
+    domainName: domainName,
+    stage: api.defaultStage!,
+    apiMappingKey: '',
+});
 }
 
 const createVpc = (construct: Construct, namingPrefix: string): ec2.Vpc => {
