@@ -23,5 +23,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: CDK Synth
-        run: npx cdk synth --require-approval never
+      - name: CDK Diff
+        run: npx cdk diff --require-approval never
