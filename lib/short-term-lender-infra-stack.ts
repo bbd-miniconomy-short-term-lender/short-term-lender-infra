@@ -88,7 +88,6 @@ const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: 
     api: api,
     domainName: domainName,
     stage: api.defaultStage!,
-    apiMappingKey: '',
 });
 }
 
