@@ -47,6 +47,7 @@ export class ShortTermLenderInfraStack extends cdk.Stack {
     // ===== Step No. 4 =====
     initializeCloudFrontDistribution(this, s3Bucket, props.frontEndDomain, props.frontEndCertArn, props.namingPrefix);
     initializeApiGateWay(this, ec2Instance, props.apiDomain, props.apiCertArn, props.namingPrefix, props.mTlsPemPath, props.mTlsBucketName);
+    initializeApiCloudFrontDistribution(this, ec2Instance, '', '', props.namingPrefix)
 
     initializeCognito(this, props.namingPrefix, props.frontEndDomain);
 
@@ -328,8 +329,6 @@ const initializeApiCloudFrontDistribution = (scope: Construct, ec2: ec2.Instance
         originRequestPolicyId: originRequestPolicy.originRequestPolicyId,
       },
     },
-    domainNames: [domainNames],
-    certificate: Certificate.fromCertificateArn(scope, `${namingPrefix}-api-cert`, certArn),
   });
 }
 
