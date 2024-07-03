@@ -79,10 +79,6 @@ const initializeApiGateWay = (scope: Construct, ec2: ec2.Instance, domainNames: 
     domainName: domainNames,
     certificate: Certificate.fromCertificateArn(scope, `${namingPrefix}-api-cert`, certArn),
     endpointType: apigatewayv2.EndpointType.REGIONAL,
-    mtls: {
-      bucket: s3.Bucket.fromBucketName(scope, `${namingPrefix}-bucket-connection`, mTlsBucketName),
-      key: mTlsPemPath,
-    },
   });
 
   new apigatewayv2.ApiMapping(scope, `${namingPrefix}-api-mapping`, {
